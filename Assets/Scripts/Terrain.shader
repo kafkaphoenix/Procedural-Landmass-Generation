@@ -1,10 +1,11 @@
 ﻿Shader "Custom/Terrain" {
-	Properties{
-		testTexture("Texture", 2D) = "white" {}
+	Properties {
+		testTexture("Texture", 2D) = "white"{}
 		testScale("Scale", Float) = 1
+
 	}
-	SubShader{
-			Tags { "RenderType"="Opaque" }
+	SubShader {
+		Tags { "RenderType"="Opaque" }
 		LOD 200
 		
 		CGPROGRAM
@@ -43,18 +44,16 @@
 
 		float3 triplanar(float3 worldPos, float scale, float3 blendAxes, int textureIndex) {
 			float3 scaledWorldPos = worldPos / scale;
-			
 			float3 xProjection = UNITY_SAMPLE_TEX2DARRAY(baseTextures, float3(scaledWorldPos.y, scaledWorldPos.z, textureIndex)) * blendAxes.x;
 			float3 yProjection = UNITY_SAMPLE_TEX2DARRAY(baseTextures, float3(scaledWorldPos.x, scaledWorldPos.z, textureIndex)) * blendAxes.y;
 			float3 zProjection = UNITY_SAMPLE_TEX2DARRAY(baseTextures, float3(scaledWorldPos.x, scaledWorldPos.y, textureIndex)) * blendAxes.z;
-			
 			return xProjection + yProjection + zProjection;
 		}
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
-			float heightPercent = inverseLerp(minHeight, maxHeight, IN.worldPos.y);
+			float heightPercent = inverseLerp(minHeight,maxHeight, IN.worldPos.y);
 			float3 blendAxes = abs(IN.worldNormal);
-			blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z; // To avoid excessive bright
+			blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
 
 			for (int i = 0; i < layerCount; i ++) {
 				float drawStrength = inverseLerp(-baseBlends[i]/2 - epsilon, baseBlends[i]/2, heightPercent - baseStartHeights[i]);
@@ -64,7 +63,10 @@
 
 				o.Albedo = o.Albedo * (1-drawStrength) + (baseColour+textureColour) * drawStrength;
 			}
+
+		
 		}
+
 
 		ENDCG
 	}
